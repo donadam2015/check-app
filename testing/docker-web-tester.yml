@@ -1,0 +1,27 @@
+version: '2'
+services:
+
+  web.test:
+#    build: check-web
+    image: newcheck_web.test
+    links:
+      - chromedriver
+    volumes:
+      - ./check-web:/app
+    environment:
+      PLATFORM: web
+      NODE_ENV: development
+      SERVER_PORT: 13333
+
+  chromedriver:
+    # build: chromedriver
+    image: newcheck_chromedriver
+    environment:
+      no_proxy: 'localhost'
+      HUB_ENV_no_proxy: 'localhost'
+
+networks:
+  default:
+    external:
+      name: checkapplinks_testnet
+

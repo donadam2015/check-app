@@ -1,0 +1,91 @@
+version: '2'
+services:
+  elasticsearch:
+    image: meedan/elasticsearch
+    ports:
+      - 9200:9200
+    networks:
+      testnet:
+        ipv4_address: 172.44.0.105
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+    networks:
+      testnet:
+        ipv4_address: 172.44.0.104
+
+  api.test:
+    build: check-api
+    ports:
+      - 13000:13000
+    links:
+      - elasticsearch
+      - postgres
+      - pender.test
+    volumes:
+      - ./check-api:/app
+    environment:
+      RAILS_ENV: test
+      SERVER_PORT: 13000
+    networks:
+      testnet:
+        ipv4_address: 172.44.0.103
+
+  pender.test:
+    build: pender
+    ports:
+      - 13200:13200
+    volumes:
+      - ./pender:/app
+    environment:
+      RAILS_ENV: test
+      SERVER_PORT: 13200
+    networks:
+      testnet:
+        ipv4_address: 172.44.0.102
+
+  web.test:
+    build: check-web
+    ports:
+      - 13333:13333
+    links:
+      - api.test
+      - chromedriver
+    volumes:
+      - ./check-web:/app
+    environment:
+      PLATFORM: web
+      NODE_ENV: development
+      SERVER_PORT: 13333
+    networks:
+      testnet:
+        ipv4_address: 172.44.0.101
+
+  chromedriver:
+    build: chromedriver
+    ports:
+      - 4444:4444
+      - 5900:5900
+    environment:
+      no_proxy: 'localhost'
+      HUB_ENV_no_proxy: 'localhost'
+    networks:
+      testnet:
+        ipv4_address: 172.44.0.110
+    
+
+networks:
+  testnet:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.44.0.0/16
+        gateway: 172.44.0.1
+      

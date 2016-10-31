@@ -1,0 +1,95 @@
+version: '2'
+services:
+  elasticsearch:
+    image: meedan/elasticsearch
+    ports:
+      - 9200:9200
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      devnet:
+        ipv4_address: 172.22.0.105
+ #   networks:
+ #     - front
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data      
+    environment:
+      POSTGRES_PASSWORD: postgres
+    networks:
+      devnet:
+        ipv4_address: 172.22.0.104
+ #   networks:
+ #     - front
+
+  api:
+    build: check-api
+    ports:
+      - 3000:3000
+    links:
+      - elasticsearch
+      - postgres
+      - pender
+    volumes:
+      - ./check-api:/app
+    environment:
+      RAILS_ENV: development
+      SERVER_PORT: 3000
+    networks:
+      devnet:
+        ipv4_address: 172.22.0.103
+
+  pender:
+    build: pender
+    ports:
+      - 3200:3200
+#    volumes:
+#      - ./pender:/app
+    environment:
+      RAILS_ENV: development
+      SERVER_PORT: 3200
+    networks:
+      devnet:
+        ipv4_address: 172.22.0.102
+
+  web:
+    build: check-web
+    ports:
+      - 3333:3333
+    links:
+      - api
+    volumes:
+      - ./check-web:/app
+    environment:
+      PLATFORM: web
+      NODE_ENV: development
+      SERVER_PORT: 3333
+    networks:
+      devnet:
+        ipv4_address: 172.22.0.101
+        
+networks:
+  devnet:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.22.0.0/16
+        gateway: 172.22.0.1
+#        aux_addresses:
+#            web.test:           172.22.0.101
+#            pender.test:        172.22.0.102
+#            api.test:           172.22.0.103
+#            postgres.test:      172.22.0.104
+#            elasticsearch.test: 172.22.0.105
+#networks:
+#  default:
+#    external:
+#      name: checkappbridge
+    

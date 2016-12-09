@@ -27,7 +27,8 @@ services:
  #     - front
 
   api:
-    build: check-api
+#    build: check-api
+    image: meedan/check-api:develop
     ports:
       - 3000:3000
     links:

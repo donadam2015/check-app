@@ -1,3 +1,7 @@
 npm-debug.log
 config-*.tar.gz
-.project
+postgres/data
+elasticsearch/data
+elasticsearch/snapshots
+/.project
+

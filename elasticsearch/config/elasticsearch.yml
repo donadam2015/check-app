@@ -5,9 +5,9 @@ path:
    repo: /usr/share/elasticsearch/snapshots
    scripts: /usr/share/elasticsearch/scripts
 cluster:
-   name: ${HOSTNAME}-cluster
+   name: check-app-cluster
 node:
-   name: ${HOSTNAME}
+   name: check-app-node
 http:
    cors:
       enabled:        true

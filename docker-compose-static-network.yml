@@ -5,7 +5,10 @@ services:
     ports:
       - 9200:9200
     volumes:
-      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ./elasticsearch/config:/usr/share/elasticsearch/config
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+      - ./elasticsearch/snapshots:/usr/share/elasticsearch/snapshots      
+      - ./elasticsearch/scripts:/usr/share/elasticsearch/scripts      
     networks:
       devnet:
         ipv4_address: 172.22.0.105
@@ -17,7 +20,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data      
+      - ./postgres/data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgres
     networks:
@@ -27,7 +30,7 @@ services:
  #     - front
 
   api:
-#    build: check-api
+    build: check-api
     image: meedan/check-api:develop
     ports:
       - 3000:3000
@@ -46,6 +49,7 @@ services:
 
   pender:
     build: pender
+    image: meedan/pender:develop
     ports:
       - 3200:3200
 #    volumes:
@@ -59,6 +63,7 @@ services:
 
   web:
     build: check-web
+    image: meedan/check-web:develop
     ports:
       - 3333:3333
     links:
